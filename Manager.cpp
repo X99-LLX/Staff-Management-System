@@ -5,12 +5,12 @@ Manager::Manager() {
 	ifs.open(filename, ios::in);
 	if (!ifs.is_open()) {
 		cout << "文件不存在" << endl;
-		this->em_num = 0;
-		this->em_arr = NULL;
-		this->empty = 1;
+	this->em_num = 0;
+	this->em_arr = NULL;
+	this->empty = 1;
 		ifs.close();
 		return;
-	}
+}
 
 	char test = ifs.get();
 	if (ifs.eof()) {
@@ -76,6 +76,7 @@ void Manager::system1() {
 }
 
 void Manager::Exit_system() {
+	system1();
 	cout << "已退出管理器，欢迎下次使用！" << endl;
 	system1();
 	exit(0);
@@ -114,7 +115,7 @@ void Manager::Add_information() {
 			int did;
 			cout << "输入第 " << i + 1 << " 个人的编号" << endl;
 			while (1) {
-				cin >> id;
+			cin >> id;
 				int temp = 1;
 				for (int i = 0; i < this->em_num; i++) {
 					if (newspace[i]->id == id) {
