@@ -49,5 +49,7 @@ public:
 
 	void Delete_all();
 
+	void Delete();
+
 	void menu();
 };

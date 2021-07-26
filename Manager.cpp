@@ -431,6 +431,21 @@ void Manager::Information_sorting() {
 	this->save();
 }
 
+void Manager::Delete() {
+	for (int i = 0; i < this->em_num; i++) {
+		if (this->em_arr[i] != NULL) {
+			delete this->em_arr[i];
+		}
+	}
+	delete[]this->em_arr;
+	this->em_arr = NULL;
+	this->empty = 1;
+	this->em_num = 0;
+	this->save();
+	cout << "已删除所有信息！" << endl;
+	system1();
+}
+
 void Manager::Delete_all() {
 	if (this->empty) {
 		cout << "文件不存在或文件为空！" << endl;
@@ -445,13 +460,7 @@ void Manager::Delete_all() {
 	switch (sel)
 	{
 	case 1:
-		cout << "已删除所有信息！" << endl;
-		delete[] this->em_arr;
-		this->em_arr = NULL;
-		this->em_num = 0;
-		this->empty = 1;
-		system1();
-		this->save();
+		Delete();
 		break;
 	default:
 		cout << "取消！" << endl;
