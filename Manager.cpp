@@ -5,16 +5,16 @@ Manager::Manager() {
 	ifs.open(filename, ios::in);
 	if (!ifs.is_open()) {
 		cout << "文件不存在" << endl;
-	this->em_num = 0;
-	this->em_arr = NULL;
-	this->empty = 1;
+		this->em_num = 0;
+		this->em_arr = NULL;
+		this->empty = 1;
 		ifs.close();
 		return;
 }
 
 	char test = ifs.get();
 	if (ifs.eof()) {
-		cout << "empty" << endl;
+		//cout << "empty" << endl;
 		this->em_num = 0;
 		this->em_arr = NULL;
 		this->empty = 1;
@@ -22,6 +22,7 @@ Manager::Manager() {
 		return;
 	}
 	ifs.close();
+	this->empty = 0;
 	this->em_num = getnewnum();
 	this->innitworker();
 }
@@ -92,7 +93,7 @@ void Manager::menu() {
 	cout << "**********  4.修改职工信息  **********" << endl;
 	cout << "**********  5.查找职工信息  **********" << endl;
 	cout << "**********  6.按照编号排序  **********" << endl;
-	cout << "**********  7.删除所有文档  **********" << endl;
+	cout << "**********  7.删除所有信息  **********" << endl;
 	cout << "**************************************" << endl;
 }
 
@@ -179,6 +180,12 @@ void Manager::save() {
 			<< this->em_arr[i]->d_id << endl;
 	}
 	ofs.close();
+	if (this->empty) {
+		this->empty = 0;
+	}
+	if (this->em_num == 0) {
+		this->empty = 1;
+	}
 }
 
 void Manager::Display_information() {
@@ -196,6 +203,11 @@ void Manager::Display_information() {
 }
 
 void Manager::Delete_information() {
+	if (this->empty) {
+		cout << "文件不存在或文件为空！" << endl;
+		system1();
+		return;
+	}
 	int id; //string name;
 	cout << "请输入离职员工的编号" << endl;
 	cin >> id;
@@ -225,3 +237,225 @@ int Manager::findworker(int id) {
 	return -1;
 }
 
+int Manager::findworker(string id) {
+	for (int i = 0; i < this->em_num; i++) {
+		if (this->em_arr[i]->name == id) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void Manager::Modify_information() {
+	if (this->empty) {
+		cout << "文件不存在或文件为空！" << endl;
+		system1();
+		return;
+	}
+	int find;
+	cout << "请输入要修改的职工编号" << endl;
+	int id1;
+	cin >> id1;
+	find = findworker(id1);
+	if (find == -1) {
+		cout << "您输入的用户不存在!" << endl;
+		system1();
+	}
+	else {
+		worker* w1 = NULL;
+		int id;
+		string name;
+		int did;
+		cout << "输入第新的员工编号" << endl;
+		delete em_arr[find];
+		while (1) {
+			cin >> id;
+			int temp = 1;
+			for (int i = 0; i < this->em_num; i++) {
+				if (this->em_arr[i]->id == id) {
+					cout << "**错误**   已存在编号为 " << id << " 的员工！  请重新输入" << endl;
+					temp = 0;
+					break;
+				}
+			}
+			if (temp == 0) {
+				continue;
+			}
+			else {
+				break;
+			}
+		}
+		cout << "输入新的员工名称" << endl;
+		cin >> name;
+		cout << "输入新的员工岗位" << endl;
+		cout << "1 : 员工 " << endl;
+		cout << "2 : 经理 " << endl;
+		cout << "3 : 老板 " << endl;
+		cin >> did;
+		switch (did)
+		{
+		case 1:w1 = new Employee(id, name, did);
+			break;
+		case 2:w1 = new mana(id, name, did);
+			break;
+		case 3:w1 = new boss(id, name, did);
+			break;
+		default:
+			cout << "输入错误!" << endl;
+			return;
+			break;
+		}
+		em_arr[find] = w1;
+		this->save();
+		system1();
+	}
+}
+
+void Manager::Find_information() {
+	if (this->empty) {
+		cout << "文件不存在或文件为空！" << endl;
+		system1();
+		return;
+	}
+	int id; string name; int ret; int sel;
+	cout << "以姓名查找或者编号查找" << endl
+		 << "1-----姓名查找" << endl
+	     << "2-----编号查找" << endl;
+	cin >> sel;
+	switch (sel) {
+	case 1:
+		cout << "输入您要查找的员工姓名 " << endl;
+		cin >> name;
+		ret = findworker(name);
+		break;
+	case 2:
+		cout << "输入您要查找的员工编号 " << endl;
+		cin >> id;
+		ret = findworker(id);
+		break;
+	default:
+		cout << "输入错误！" << endl;
+		system1();
+		return;
+	}
+	if (ret == -1) {
+		cout << "您查找的员工不存在!" << endl;
+	}
+	else {
+		cout << "编号" << "\t\t" << "姓名" << "\t\t" << "部门" << "\t\t" << "职责" << endl;
+		this->em_arr[ret]->showthis();
+	}
+	system1();
+}
+
+void Manager::Sort_ascending(worker** a,int begin, int end) {
+	if (begin > end) {
+		return;
+	}
+	int temp = this->em_arr[begin]->id;
+	int i = begin;
+	int j = end;
+	while (i != j) {
+		while (this->em_arr[j]->id >= temp && j > i) {
+			j--;
+		}
+		while (this->em_arr[i]->id <= temp && j > i) {
+			i++;
+		}
+		if (i < j) {
+			worker* a = this->em_arr[i];
+			this->em_arr[i] = this->em_arr[j];
+			this->em_arr[j] = a;
+		}
+	}
+	worker* b = this->em_arr[begin];
+	this->em_arr[begin] = this->em_arr[i];
+	this->em_arr[i] = b;
+	Sort_ascending(this->em_arr, begin, i - 1);
+	Sort_ascending(this->em_arr, i + 1, end);
+}
+
+void Manager::Sort_descending(worker** a, int begin, int end) {
+	if (begin > end) {
+		return;
+	}
+	int temp = this->em_arr[begin]->id;
+	int i = begin;
+	int j = end;
+	while (i != j) {
+		while (this->em_arr[j]->id <= temp && j > i) {
+			j--;
+		}
+		while (this->em_arr[i]->id >= temp && j > i) {
+			i++;
+		}
+		if (j < i) {
+			worker* a = this->em_arr[i];
+			this->em_arr[i] = this->em_arr[j];
+			this->em_arr[j] = a;
+		}
+	}
+	worker* b = this->em_arr[begin];
+	this->em_arr[begin] = this->em_arr[i];
+	this->em_arr[i] = b;
+	Sort_descending(this->em_arr, begin, i - 1);
+	Sort_descending(this->em_arr, i + 1, end);
+}
+
+void Manager::Information_sorting() {
+	if (this->empty) {
+		cout << "文件不存在或文件为空！" << endl;
+		system1();
+		return;
+	}
+	cout << "请选择排序方式！" << endl
+		 << "1-----升序" << endl
+		 << "2-----降序" << endl;
+	int sel;
+	cin >> sel;
+	switch (sel)
+	{
+	case 1:
+		Sort_ascending(this->em_arr,0,this->em_num-1);
+		cout << "排序完成！" << endl;
+		this->Display_information();
+		break;
+	case 2:
+		Sort_descending(this->em_arr,0, this->em_num - 1);
+		cout << "排序完成！" << endl;
+		this->Display_information();
+		break;
+	default:
+		break;
+	}
+	this->save();
+}
+
+void Manager::Delete_all() {
+	if (this->empty) {
+		cout << "文件不存在或文件为空！" << endl;
+		system1();
+		return;
+	}
+	cout << "确认删除所有员工信息吗！操作不可逆" << endl
+		 << "输入1确认删除！" << endl
+		 << "输入其他数取消操作! " << endl;
+	int sel;
+	cin >> sel;
+	switch (sel)
+	{
+	case 1:
+		cout << "已删除所有信息！" << endl;
+		delete[] this->em_arr;
+		this->em_arr = NULL;
+		this->em_num = 0;
+		this->empty = 1;
+		system1();
+		this->save();
+		break;
+	default:
+		cout << "取消！" << endl;
+		system1();
+		break;
+	}
+}

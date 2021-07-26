@@ -35,9 +35,15 @@ public:
 
 	int findworker(int id);
 
+	int findworker(string id);
+
 	void Modify_information();
 
 	void Find_information();
+
+	void Sort_ascending(worker** a, int begin, int end);
+
+	void Sort_descending(worker** a,int begin, int end);
 
 	void Information_sorting();
 

@@ -30,12 +30,16 @@ int main() {
 			m1.Delete_information();
 			break;
 		case 4:
+			m1.Modify_information();
 			break;
 		case 5:
+			m1.Find_information();
 			break;
 		case 6:
+			m1.Information_sorting();
 			break;
 		case 7:
+			m1.Delete_all();
 			break;
 		default:
 			cout << "请输入正确的序号!" << endl;
